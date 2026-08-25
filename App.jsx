@@ -2,8 +2,8 @@ import React, { useState, useMemo, useEffect, useRef, useCallback } from "react"
 import {
   Flame, Droplet, Dumbbell, Home, UtensilsCrossed, ChevronRight, Check,
   Plus, Minus, Lock, Sun, Moon, User, ShieldAlert, Sparkles, X, Zap,
-  Crown, Calendar, Snowflake, ArrowLeft, Shield, Gift, Medal, Mail, MailCheck,
-  Pencil, RotateCcw, Trash2, Instagram, ExternalLink, MapPin, MessageSquare, LogOut
+  Crown, Calendar, Snowflake, ArrowLeft, Shield, Gift, Medal, Mail,
+  Pencil, RotateCcw, Trash2, Instagram, ExternalLink, MessageSquare, LogOut
 } from "lucide-react";
 
 /* ═══════════════════════ DESIGN TOKENS ═══════════════════════ */
@@ -409,185 +409,8 @@ const todayKey = () => new Date().toDateString();
 const yesterdayKey = () => { const d = new Date(); d.setDate(d.getDate() - 1); return d.toDateString(); };
 const daysUntil = (s) => s ? Math.max(0, Math.ceil((new Date(s) - new Date()) / 86400000)) : null;
 
-/* ═══════════════════════ EXERCISE DEMO ═══════════════════════ */
-const POSES = {
-  squat: {
-    a: { head: [50, 15], neck: [50, 25], hip: [50, 58], knee: [51, 84], ankle: [50, 110], elbow: [42, 44], hand: [40, 60] },
-    b: { head: [44, 30], neck: [45, 40], hip: [42, 70], knee: [58, 85], ankle: [50, 110], elbow: [44, 56], hand: [52, 66] },
-  },
-  hinge: {
-    a: { head: [50, 15], neck: [50, 25], hip: [50, 58], knee: [50, 84], ankle: [50, 110], elbow: [48, 44], hand: [48, 62] },
-    b: { head: [26, 40], neck: [32, 44], hip: [52, 58], knee: [54, 84], ankle: [50, 110], elbow: [32, 62], hand: [32, 78] },
-  },
-  push: {
-    a: { head: [76, 52], neck: [68, 56], hip: [40, 68], knee: [26, 76], ankle: [14, 82], elbow: [68, 74], hand: [66, 92] },
-    b: { head: [76, 66], neck: [68, 70], hip: [40, 78], knee: [26, 84], ankle: [14, 88], elbow: [78, 80], hand: [66, 92] },
-  },
-  press: {
-    a: { head: [50, 18], neck: [50, 28], hip: [50, 62], knee: [50, 86], ankle: [50, 110], elbow: [36, 34], hand: [40, 22] },
-    b: { head: [50, 18], neck: [50, 28], hip: [50, 62], knee: [50, 86], ankle: [50, 110], elbow: [44, 16], hand: [48, 2] },
-  },
-  pull: {
-    a: { head: [30, 34], neck: [37, 38], hip: [58, 52], knee: [58, 82], ankle: [54, 110], elbow: [34, 60], hand: [33, 80] },
-    b: { head: [30, 34], neck: [37, 38], hip: [58, 52], knee: [58, 82], ankle: [54, 110], elbow: [46, 54], hand: [44, 44] },
-  },
-  plank: {
-    a: { head: [78, 56], neck: [70, 59], hip: [40, 68], knee: [26, 74], ankle: [12, 80], elbow: [70, 78], hand: [78, 82] },
-    b: { head: [78, 58], neck: [70, 61], hip: [40, 71], knee: [26, 76], ankle: [12, 82], elbow: [70, 80], hand: [78, 84] },
-  },
-  core: {
-    a: { head: [72, 70], neck: [64, 70], hip: [38, 74], knee: [24, 62], ankle: [14, 78], elbow: [64, 58], hand: [70, 50] },
-    b: { head: [64, 58], neck: [58, 62], hip: [38, 74], knee: [30, 56], ankle: [22, 72], elbow: [56, 54], hand: [50, 50] },
-  },
-  rotation: {
-    a: { head: [50, 18], neck: [50, 28], hip: [50, 62], knee: [48, 86], ankle: [48, 110], elbow: [58, 44], hand: [68, 46] },
-    b: { head: [50, 18], neck: [50, 28], hip: [50, 62], knee: [52, 86], ankle: [52, 110], elbow: [40, 44], hand: [28, 42] },
-  },
-  cardio: {
-    a: { head: [52, 14], neck: [52, 24], hip: [50, 56], knee: [62, 76], ankle: [66, 98], elbow: [38, 40], hand: [34, 54] },
-    b: { head: [52, 14], neck: [52, 24], hip: [50, 56], knee: [36, 78], ankle: [26, 96], elbow: [64, 40], hand: [70, 52] },
-  },
-  power: {
-    a: { head: [48, 32], neck: [48, 42], hip: [46, 70], knee: [58, 86], ankle: [50, 110], elbow: [34, 58], hand: [30, 74] },
-    b: { head: [50, 8], neck: [50, 18], hip: [50, 48], knee: [52, 72], ankle: [52, 96], elbow: [56, 22], hand: [60, 8] },
-  },
-  mobility: {
-    a: { head: [50, 16], neck: [50, 26], hip: [50, 60], knee: [50, 86], ankle: [50, 110], elbow: [36, 38], hand: [30, 26] },
-    b: { head: [54, 18], neck: [52, 28], hip: [50, 60], knee: [50, 86], ankle: [50, 110], elbow: [66, 38], hand: [72, 26] },
-  },
-  /* Standing, hands on wall, leaning in and out */
-  wallpush: {
-    a: { head: [52, 16], neck: [52, 26], hip: [48, 62], knee: [49, 87], ankle: [48, 112], elbow: [64, 34], hand: [78, 40] },
-    b: { head: [60, 22], neck: [59, 31], hip: [50, 64], knee: [50, 88], ankle: [48, 112], elbow: [68, 42], hand: [78, 40] },
-  },
-  /* Lying on back, pressing the bar up off the chest */
-  bench: {
-    a: { head: [18, 88], neck: [26, 88], hip: [54, 90], knee: [68, 76], ankle: [74, 96], elbow: [34, 78], hand: [30, 68] },
-    b: { head: [18, 88], neck: [26, 88], hip: [54, 90], knee: [68, 76], ankle: [74, 96], elbow: [28, 64], hand: [28, 50] },
-  },
-  /* Seated machine/incline press, pressing forward */
-  seatedpress: {
-    a: { head: [38, 26], neck: [38, 36], hip: [40, 70], knee: [60, 72], ankle: [60, 102], elbow: [46, 46], hand: [44, 42] },
-    b: { head: [38, 26], neck: [38, 36], hip: [40, 70], knee: [60, 72], ankle: [60, 102], elbow: [56, 44], hand: [72, 42] },
-  },
-  /* Standing isometric squeeze, hands pressed together with a small pulse */
-  squeeze: {
-    a: { head: [48, 16], neck: [48, 26], hip: [48, 62], knee: [48, 88], ankle: [48, 112], elbow: [58, 42], hand: [62, 40] },
-    b: { head: [48, 16], neck: [48, 26], hip: [48, 62], knee: [48, 88], ankle: [48, 112], elbow: [56, 42], hand: [58, 40] },
-  },
-  /* Pallof / anti-rotation: press straight out from the chest */
-  pressout: {
-    a: { head: [46, 16], neck: [46, 26], hip: [46, 62], knee: [47, 88], ankle: [46, 112], elbow: [54, 40], hand: [52, 36] },
-    b: { head: [46, 16], neck: [46, 26], hip: [46, 62], knee: [47, 88], ankle: [46, 112], elbow: [62, 40], hand: [78, 38] },
-  },
-  /* Seated trunk rotation, hands sweep side to side */
-  seatedrot: {
-    a: { head: [44, 26], neck: [44, 36], hip: [46, 70], knee: [64, 72], ankle: [64, 102], elbow: [56, 48], hand: [66, 50] },
-    b: { head: [42, 26], neck: [43, 36], hip: [46, 70], knee: [64, 72], ankle: [64, 102], elbow: [32, 48], hand: [22, 50] },
-  },
-  /* Hanging pull-up: hands stay on the bar, body rises */
-  pullup: {
-    a: { head: [50, 36], neck: [50, 46], hip: [50, 76], knee: [53, 95], ankle: [51, 112], elbow: [55, 26], hand: [57, 12] },
-    b: { head: [50, 24], neck: [50, 34], hip: [50, 64], knee: [57, 82], ankle: [53, 98], elbow: [62, 22], hand: [57, 12] },
-  },
-  /* Seated lat pulldown: bar pulled from overhead to the chest */
-  pulldown: {
-    a: { head: [44, 26], neck: [44, 36], hip: [46, 72], knee: [64, 74], ankle: [64, 104], elbow: [52, 20], hand: [56, 8] },
-    b: { head: [44, 28], neck: [44, 38], hip: [46, 72], knee: [64, 74], ankle: [64, 104], elbow: [54, 42], hand: [58, 32] },
-  },
-  /* Seated row / rowing machine: reach forward, drive back and pull */
-  rowmachine: {
-    a: { head: [40, 34], neck: [41, 44], hip: [46, 80], knee: [62, 70], ankle: [76, 82], elbow: [52, 58], hand: [62, 60] },
-    b: { head: [30, 30], neck: [33, 40], hip: [46, 80], knee: [66, 74], ankle: [80, 82], elbow: [36, 56], hand: [42, 58] },
-  },
-  /* Renegade row: plank position, one hand rows up */
-  renegade: {
-    a: { head: [78, 56], neck: [70, 59], hip: [40, 68], knee: [26, 74], ankle: [12, 80], elbow: [70, 78], hand: [72, 92] },
-    b: { head: [78, 54], neck: [70, 57], hip: [40, 66], knee: [26, 73], ankle: [12, 80], elbow: [64, 64], hand: [60, 70] },
-  },
-  /* Glute bridge / hip thrust: lying, hips drive up */
-  bridge: {
-    a: { head: [16, 100], neck: [24, 101], hip: [50, 104], knee: [66, 88], ankle: [72, 108], elbow: [30, 106], hand: [38, 108] },
-    b: { head: [16, 100], neck: [24, 100], hip: [52, 82], knee: [66, 82], ankle: [72, 108], elbow: [30, 106], hand: [38, 108] },
-  },
-  /* Pelvic tilt: lying supine, small controlled hip motion */
-  supine: {
-    a: { head: [16, 102], neck: [24, 102], hip: [50, 105], knee: [66, 90], ankle: [72, 108], elbow: [30, 107], hand: [38, 109] },
-    b: { head: [16, 102], neck: [24, 102], hip: [50, 100], knee: [66, 88], ankle: [72, 108], elbow: [30, 107], hand: [38, 109] },
-  },
-  /* Dead bug: lying, opposite arm and leg extend away */
-  deadbug: {
-    a: { head: [16, 100], neck: [24, 100], hip: [48, 102], knee: [56, 84], ankle: [54, 68], elbow: [28, 86], hand: [28, 70] },
-    b: { head: [16, 100], neck: [24, 100], hip: [48, 102], knee: [64, 90], ankle: [80, 86], elbow: [16, 90], hand: [6, 80] },
-  },
-  /* Bird dog: all fours, opposite arm and leg reach out */
-  birddog: {
-    a: { head: [78, 58], neck: [70, 61], hip: [42, 64], knee: [38, 84], ankle: [24, 88], elbow: [70, 76], hand: [72, 90] },
-    b: { head: [80, 54], neck: [72, 57], hip: [42, 62], knee: [34, 68], ankle: [16, 60], elbow: [80, 58], hand: [94, 52] },
-  },
-  /* Standing march: knee drives up, opposite arm swings */
-  march: {
-    a: { head: [50, 14], neck: [50, 24], hip: [50, 58], knee: [53, 84], ankle: [51, 110], elbow: [44, 42], hand: [42, 56] },
-    b: { head: [50, 14], neck: [50, 24], hip: [50, 58], knee: [62, 64], ankle: [58, 84], elbow: [57, 40], hand: [60, 52] },
-  },
-  /* Wall sit: seated hold against the wall, near-static */
-  wallsit: {
-    a: { head: [46, 34], neck: [46, 44], hip: [46, 76], knee: [66, 78], ankle: [66, 108], elbow: [42, 58], hand: [42, 72] },
-    b: { head: [46, 35], neck: [46, 45], hip: [46, 77], knee: [66, 78], ankle: [66, 108], elbow: [42, 59], hand: [42, 73] },
-  },
-  /* Step-up: drive up onto the box */
-  stepup: {
-    a: { head: [44, 20], neck: [44, 30], hip: [44, 64], knee: [47, 89], ankle: [45, 112], elbow: [38, 46], hand: [36, 60] },
-    b: { head: [54, 12], neck: [54, 22], hip: [54, 56], knee: [66, 74], ankle: [64, 94], elbow: [48, 38], hand: [50, 50] },
-  },
-  /* Seated leg/knee extension: shin swings out until straight */
-  seatedext: {
-    a: { head: [42, 28], neck: [42, 38], hip: [44, 72], knee: [62, 74], ankle: [60, 102], elbow: [38, 52], hand: [40, 66] },
-    b: { head: [42, 28], neck: [42, 38], hip: [44, 72], knee: [62, 74], ankle: [88, 70], elbow: [38, 52], hand: [40, 66] },
-  },
-  /* Leg press: reclined seat, legs press away */
-  legpress: {
-    a: { head: [22, 50], neck: [28, 56], hip: [42, 80], knee: [56, 62], ankle: [60, 78], elbow: [34, 70], hand: [42, 78] },
-    b: { head: [22, 50], neck: [28, 56], hip: [42, 80], knee: [64, 56], ankle: [84, 50], elbow: [34, 70], hand: [42, 78] },
-  },
-  /* Split squat / lunge: staggered stance, drop straight down */
-  lunge: {
-    a: { head: [50, 16], neck: [50, 26], hip: [50, 60], knee: [62, 82], ankle: [62, 110], elbow: [44, 44], hand: [42, 58] },
-    b: { head: [50, 28], neck: [50, 38], hip: [50, 72], knee: [66, 88], ankle: [62, 110], elbow: [44, 54], hand: [44, 66] },
-  },
-  /* Med ball slam: ball from overhead down through the floor */
-  slam: {
-    a: { head: [48, 12], neck: [48, 22], hip: [50, 58], knee: [52, 84], ankle: [50, 110], elbow: [56, 14], hand: [58, 2] },
-    b: { head: [38, 34], neck: [40, 43], hip: [52, 62], knee: [55, 86], ankle: [50, 110], elbow: [40, 58], hand: [36, 74] },
-  },
-  /* Jump rope: light bounce, hands turning at the sides */
-  jumprope: {
-    a: { head: [50, 16], neck: [50, 26], hip: [50, 60], knee: [52, 86], ankle: [50, 112], elbow: [60, 50], hand: [66, 58] },
-    b: { head: [50, 10], neck: [50, 20], hip: [50, 54], knee: [53, 79], ankle: [50, 103], elbow: [62, 46], hand: [68, 54] },
-  },
-  /* Stationary bike: seated, legs turning the pedals */
-  bike: {
-    a: { head: [34, 32], neck: [36, 42], hip: [44, 74], knee: [62, 66], ankle: [70, 84], elbow: [46, 54], hand: [58, 58] },
-    b: { head: [34, 32], neck: [36, 42], hip: [44, 74], knee: [58, 82], ankle: [62, 100], elbow: [46, 54], hand: [58, 58] },
-  },
-  /* Seated arm cycle: seated, arms turning the crank */
-  armcycle: {
-    a: { head: [40, 30], neck: [40, 40], hip: [44, 74], knee: [62, 76], ankle: [62, 104], elbow: [52, 50], hand: [62, 44] },
-    b: { head: [40, 30], neck: [40, 40], hip: [44, 74], knee: [62, 76], ankle: [62, 104], elbow: [50, 58], hand: [58, 66] },
-  },
-  /* Prowler / sled push: leaning into the sled, legs driving */
-  prowler: {
-    a: { head: [70, 34], neck: [64, 40], hip: [44, 62], knee: [52, 86], ankle: [42, 110], elbow: [76, 48], hand: [86, 56] },
-    b: { head: [70, 34], neck: [64, 40], hip: [46, 62], knee: [38, 84], ankle: [54, 108], elbow: [76, 48], hand: [86, 56] },
-  },
-  /* Foam rolling: body over the roller, slow shift along it */
-  foamroll: {
-    a: { head: [76, 72], neck: [68, 74], hip: [42, 84], knee: [30, 90], ankle: [18, 96], elbow: [72, 88], hand: [76, 98] },
-    b: { head: [72, 72], neck: [64, 74], hip: [38, 84], knee: [26, 90], ankle: [14, 96], elbow: [68, 88], hand: [72, 98] },
-  },
-};
-
-/* Maps each exercise name to its accurate movement pose.
+/* ═══════════════════════ EXERCISE MATCHING ═══════════════════════ */
+/* Classifies an exercise so the right written cue is shown.
    Specific matches are checked BEFORE generic ones — order matters. */
 function patternFor(name = "") {
   const n = name.toLowerCase();
@@ -744,62 +567,6 @@ function explainFor(name = "") {
   const n = name.toLowerCase();
   for (const [re, t] of EXPLAIN) if (re.test(n)) return t;
   return PATTERN_EXPLAIN[patternFor(name)] || PATTERN_EXPLAIN.core;
-}
-
-function ExerciseDemo({ c, name, size = 84, playing = true }) {
-  const [t, setT] = useState(0);
-  const raf = useRef();
-  const pattern = patternFor(name);
-  const pose = POSES[pattern] || POSES.core;
-
-  useEffect(() => {
-    if (!playing) return;
-    let start = null;
-    const loop = (ts) => {
-      if (start === null) start = ts;
-      const cycle = 1800;
-      const phase = ((ts - start) % cycle) / cycle;
-      const raw = phase < 0.5 ? phase * 2 : (1 - phase) * 2;
-      setT(raw < 0.5 ? 2 * raw * raw : 1 - Math.pow(-2 * raw + 2, 2) / 2);
-      raf.current = requestAnimationFrame(loop);
-    };
-    raf.current = requestAnimationFrame(loop);
-    return () => cancelAnimationFrame(raf.current);
-  }, [playing, pattern]);
-
-  const lerp = (k) => {
-    const [ax, ay] = pose.a[k], [bx, by] = pose.b[k];
-    return [ax + (bx - ax) * t, ay + (by - ay) * t];
-  };
-  const P = {
-    head: lerp("head"), neck: lerp("neck"), hip: lerp("hip"),
-    knee: lerp("knee"), ankle: lerp("ankle"), elbow: lerp("elbow"), hand: lerp("hand"),
-  };
-  const line = (a, b, w, col, op = 1) => (
-    <line x1={a[0]} y1={a[1]} x2={b[0]} y2={b[1]} stroke={col} strokeWidth={w} strokeLinecap="round" opacity={op} />
-  );
-
-  return (
-    <svg viewBox="0 0 100 120" style={{ width: size, height: size * 1.2, display: "block" }}>
-      <g opacity=".18">
-        {line(pose.b.neck, pose.b.hip, 9, c.muted)}
-        {line(pose.b.hip, pose.b.knee, 7, c.muted)}
-        {line(pose.b.knee, pose.b.ankle, 6, c.muted)}
-        {line(pose.b.neck, pose.b.elbow, 6, c.muted)}
-        {line(pose.b.elbow, pose.b.hand, 5, c.muted)}
-        <circle cx={pose.b.head[0]} cy={pose.b.head[1]} r="8" fill={c.muted} />
-      </g>
-      <line x1="4" y1="114" x2="96" y2="114" stroke={c.border} strokeWidth="2" strokeLinecap="round" />
-      {line([P.hip[0] - 3, P.hip[1]], [P.knee[0] - 6, P.knee[1]], 7, c.turqDeep, .55)}
-      {line([P.knee[0] - 6, P.knee[1]], [P.ankle[0] - 6, P.ankle[1]], 6, c.turqDeep, .55)}
-      {line(P.neck, P.hip, 10, c.red)}
-      {line(P.hip, P.knee, 8, c.turq)}
-      {line(P.knee, P.ankle, 6.5, c.turq)}
-      {line(P.neck, P.elbow, 6.5, c.red)}
-      {line(P.elbow, P.hand, 5.5, c.red)}
-      <circle cx={P.head[0]} cy={P.head[1]} r="8.5" fill={c.text} />
-    </svg>
-  );
 }
 
 /* ═══════════════════════ ANATOMY DIAGRAM ═══════════════════════ */
@@ -1064,7 +831,7 @@ const Toast = ({ c, toast }) => !toast ? null : (
     background: c.bgEl2, border: `1px solid ${c.turq}`, borderRadius: 14, padding: "12px 18px",
     display: "flex", alignItems: "center", gap: 10, boxShadow: `0 8px 26px ${c.turqGlow}`,
     zIndex: 300, maxWidth: "88%", animation: "toastIn .25s ease",
-  }}>
+  }} className="aac-toast">
     <Sparkles size={16} color={c.turq} />
     <span style={{ fontFamily: "Inter", fontSize: 13, fontWeight: 700, color: c.text }}>{toast}</span>
   </div>
@@ -1388,99 +1155,10 @@ function Onboarding({ c, onDone }) {
       {step === 7 && (
         <StepShell c={c} n={7} total={TOTAL_STEPS} title="ANYTHING TO PROTECT?"
           sub="Tap the muscles or joints giving you trouble. We'll swap any exercise that stresses them."
-          label="Create Account" onNext={() => onDone(f)} onBack={back}>
+          label="Start Training" onNext={() => onDone(f)} onBack={back}>
           <AnatomyPicker c={c} selected={f.injuries} onToggle={(id) => toggleArr("injuries", id)} />
         </StepShell>
       )}
-    </div>
-  );
-}
-
-/* ═══════════════════════ EMAIL CONFIRMATION ═══════════════════════ */
-function ConfirmEmail({ c, profile, onConfirm }) {
-  const [sent, setSent] = useState(false);
-  const [confirming, setConfirming] = useState(false);
-  const coach = COACHES[profile.gender === "female" ? "female" : "male"];
-
-  return (
-    <div style={{ padding: "24px 20px", minHeight: "100%", display: "flex", flexDirection: "column" }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 18 }}>
-        <Mail size={17} color={c.turq} />
-        <span style={{ fontFamily: "Inter", fontSize: 12.5, fontWeight: 700, color: c.muted }}>
-          Sent to {profile.email}
-        </span>
-      </div>
-
-      <div style={{
-        background: "#FFFFFF", borderRadius: 16, overflow: "hidden",
-        border: `1px solid ${c.border}`, boxShadow: "0 10px 34px rgba(0,0,0,.22)", marginBottom: 20,
-      }}>
-        <div style={{
-          background: `linear-gradient(135deg,#0A090C 0%,#1A1620 60%,#0E2E2B 100%)`,
-          padding: "26px 22px 22px", textAlign: "center", position: "relative", overflow: "hidden",
-        }}>
-          <div style={{
-            position: "absolute", top: -40, right: -30, width: 130, height: 130, borderRadius: "50%",
-            background: "radial-gradient(circle,rgba(46,217,195,.22),transparent 70%)",
-          }} />
-          <div style={{
-            width: 44, height: 44, borderRadius: 13, margin: "0 auto 12px",
-            background: "linear-gradient(135deg,#F0202F,#2ED9C3)", display: "flex",
-            alignItems: "center", justifyContent: "center",
-          }}>
-            <span style={{ fontFamily: "'Bebas Neue'", color: "#fff", fontSize: 18, letterSpacing: 1.2 }}>AAC</span>
-          </div>
-          <div style={{ fontFamily: "'Bebas Neue'", fontSize: 24, color: "#fff", letterSpacing: 1.5, lineHeight: 1 }}>
-            ALL ABOUT CONSISTENCY
-          </div>
-          <div style={{ fontFamily: "Inter", fontSize: 9.5, color: "#2ED9C3", fontWeight: 800,
-            letterSpacing: 2.2, marginTop: 7 }}>
-            ACCOUNT CONFIRMATION
-          </div>
-        </div>
-
-        <div style={{ padding: "26px 24px 28px", textAlign: "center" }}>
-          <div style={{ fontFamily: "'Bebas Neue'", fontSize: 27, color: "#141216", letterSpacing: .5, lineHeight: 1.05 }}>
-            CONGRATULATIONS ON YOUR<br />FITNESS JOURNEY
-          </div>
-          <div style={{ width: 42, height: 3, borderRadius: 2, margin: "14px auto",
-            background: "linear-gradient(90deg,#F0202F,#2ED9C3)" }} />
-          <div style={{ fontFamily: "Inter", fontSize: 13.5, color: "#4A464E", lineHeight: 1.65, marginBottom: 22 }}>
-            {profile.name ? `${profile.name}, your` : "Your"} account is ready and {coach.name} is standing by.
-            Confirm your email to unlock your plan, your streak, and everything you build from here.
-          </div>
-
-          <button onClick={() => { setConfirming(true); setTimeout(onConfirm, 900); }} disabled={confirming} style={{
-            padding: "15px 30px", borderRadius: 12, border: "none", cursor: confirming ? "default" : "pointer",
-            background: confirming ? "#8A8890" : "linear-gradient(135deg,#F0202F,#C4101C)",
-            color: "#fff", fontFamily: "Inter", fontWeight: 800, fontSize: 14.5,
-            boxShadow: confirming ? "none" : "0 6px 20px rgba(240,32,47,.34)",
-            display: "inline-flex", alignItems: "center", gap: 9, transition: "all .2s",
-          }}>
-            {confirming ? "Confirming…" : <>Confirm My Email <MailCheck size={17} /></>}
-          </button>
-
-          <div style={{ fontFamily: "Inter", fontSize: 11, color: "#8A8690", marginTop: 20, lineHeight: 1.6 }}>
-            This link expires in 24 hours.<br />
-            Didn't create this account? You can safely ignore this email.
-          </div>
-        </div>
-
-        <div style={{ background: "#F4F1EC", padding: "15px 22px", textAlign: "center", borderTop: "1px solid #E4DFD7" }}>
-          <div style={{ fontFamily: "Inter", fontSize: 10, color: "#8A8690", lineHeight: 1.7 }}>
-            All About Consistency · Dedication over comfort<br />
-            Manage preferences · Unsubscribe · Privacy
-          </div>
-        </div>
-      </div>
-
-      <button onClick={() => setSent(true)} disabled={sent} style={{
-        background: "none", border: "none", cursor: sent ? "default" : "pointer",
-        fontFamily: "Inter", fontSize: 12.5, fontWeight: 700,
-        color: sent ? c.turq : c.muted, padding: 8, marginTop: "auto",
-      }}>
-        {sent ? "Confirmation resent ✓" : "Didn't get it? Resend email"}
-      </button>
     </div>
   );
 }
@@ -1501,7 +1179,7 @@ function SessionsScreen({ c, p }) {
   );
 
   return (
-    <div style={{ padding: "18px 18px 100px" }}>
+    <div style={{ padding: "18px 18px 120px" }}>
       <Disp c={c} size={30} style={{ marginBottom: 4 }}>1:1 SESSIONS</Disp>
       <div style={{ fontFamily: "Inter", fontSize: 13, color: c.muted, marginBottom: 18, lineHeight: 1.55 }}>
         The app handles the plan. For hands-on coaching, book an in-person session with the trainer.
@@ -1685,7 +1363,7 @@ function HomeScreen({ c, p, water, cals, badges, quests, rewards, onTrain, onSes
   const ring = 168, r = 74, circ = 2 * Math.PI * r;
 
   return (
-    <div style={{ padding: "18px 18px 100px" }}>
+    <div style={{ padding: "18px 18px 120px" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
         <div>
           <div style={{ fontFamily: "Inter", fontSize: 12, color: c.muted, fontWeight: 700 }}>
@@ -1954,7 +1632,7 @@ function TrainScreen({ c, p, setP, toast, celebrate, custom, setCustom }) {
   }));
 
   return (
-    <div style={{ padding: "18px 18px 100px" }}>
+    <div style={{ padding: "18px 18px 120px" }}>
       <Disp c={c} size={30} style={{ marginBottom: 4 }}>TRAIN</Disp>
       <div style={{ fontFamily: "Inter", fontSize: 13, color: c.muted, marginBottom: 18 }}>
         Built around your gear, your level, and what you're protecting.
@@ -2060,14 +1738,6 @@ function TrainScreen({ c, p, setP, toast, celebrate, custom, setCustom }) {
                 }}>{on && <Check size={15} color="#fff" strokeWidth={3.5} />}</button>
 
                 <button onClick={() => setOpenDemo(openDemo === i ? null : i)} style={{
-                  width: 52, height: 58, borderRadius: 11, flexShrink: 0, cursor: "pointer", padding: 0,
-                  border: `1px solid ${c.border}`, background: c.bgEl2, overflow: "hidden",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                }}>
-                  <ExerciseDemo c={c} name={e.name} size={44} />
-                </button>
-
-                <button onClick={() => setOpenDemo(openDemo === i ? null : i)} style={{
                   flex: 1, background: "none", border: "none", cursor: "pointer", textAlign: "left", padding: 0, minWidth: 0,
                 }}>
                   <div style={{ fontFamily: "Inter", fontSize: 10, color: c.muted, fontWeight: 800, letterSpacing: .8 }}>
@@ -2086,17 +1756,11 @@ function TrainScreen({ c, p, setP, toast, celebrate, custom, setCustom }) {
               </div>
 
               {openDemo === i && (
-                <div style={{ marginTop: 12, paddingTop: 12, borderTop: `1px solid ${c.border}`,
-                  display: "flex", alignItems: "center", gap: 14 }}>
-                  <div style={{ background: c.bgEl2, borderRadius: 13, padding: 6 }}>
-                    <ExerciseDemo c={c} name={e.name} size={92} />
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontFamily: "Inter", fontSize: 10.5, fontWeight: 800, letterSpacing: 1,
-                      color: c.turq, marginBottom: 5 }}>MOVEMENT DEMO</div>
-                    <div style={{ fontFamily: "Inter", fontSize: 11.5, color: c.muted, lineHeight: 1.55 }}>
-                      {explainFor(e.name)}
-                    </div>
+                <div style={{ marginTop: 12, paddingTop: 12, borderTop: `1px solid ${c.border}` }}>
+                  <div style={{ fontFamily: "Inter", fontSize: 10.5, fontWeight: 800, letterSpacing: 1,
+                    color: c.turq, marginBottom: 6 }}>HOW TO DO IT</div>
+                  <div style={{ fontFamily: "Inter", fontSize: 12.5, color: c.text, lineHeight: 1.6 }}>
+                    {explainFor(e.name)}
                   </div>
                 </div>
               )}
@@ -2196,14 +1860,6 @@ function TrainScreen({ c, p, setP, toast, celebrate, custom, setCustom }) {
                 }}>{on && <Check size={15} color="#fff" strokeWidth={3.5} />}</button>
 
                 <button onClick={() => setOpenCoreDemo(openCoreDemo === i ? null : i)} style={{
-                  width: 52, height: 58, borderRadius: 11, flexShrink: 0, cursor: "pointer", padding: 0,
-                  border: `1px solid ${c.border}`, background: c.bgEl2, overflow: "hidden",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                }}>
-                  <ExerciseDemo c={c} name={e.name} size={44} />
-                </button>
-
-                <button onClick={() => setOpenCoreDemo(openCoreDemo === i ? null : i)} style={{
                   flex: 1, background: "none", border: "none", cursor: "pointer", textAlign: "left", padding: 0, minWidth: 0,
                 }}>
                   <div style={{ fontFamily: "Inter", fontSize: 10, color: c.red, fontWeight: 800, letterSpacing: .8 }}>
@@ -2215,17 +1871,11 @@ function TrainScreen({ c, p, setP, toast, celebrate, custom, setCustom }) {
               </div>
 
               {openCoreDemo === i && (
-                <div style={{ marginTop: 12, paddingTop: 12, borderTop: `1px solid ${c.border}`,
-                  display: "flex", alignItems: "center", gap: 14 }}>
-                  <div style={{ background: c.bgEl2, borderRadius: 13, padding: 6 }}>
-                    <ExerciseDemo c={c} name={e.name} size={92} />
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontFamily: "Inter", fontSize: 10.5, fontWeight: 800, letterSpacing: 1,
-                      color: c.turq, marginBottom: 5 }}>MOVEMENT DEMO</div>
-                    <div style={{ fontFamily: "Inter", fontSize: 11.5, color: c.muted, lineHeight: 1.55 }}>
-                      {explainFor(e.name)}
-                    </div>
+                <div style={{ marginTop: 12, paddingTop: 12, borderTop: `1px solid ${c.border}` }}>
+                  <div style={{ fontFamily: "Inter", fontSize: 10.5, fontWeight: 800, letterSpacing: 1,
+                    color: c.turq, marginBottom: 6 }}>HOW TO DO IT</div>
+                  <div style={{ fontFamily: "Inter", fontSize: 12.5, color: c.text, lineHeight: 1.6 }}>
+                    {explainFor(e.name)}
                   </div>
                 </div>
               )}
@@ -2272,7 +1922,7 @@ function TrackScreen({ c, water, setWater, cals, setCals, toast }) {
   };
 
   return (
-    <div style={{ padding: "18px 18px 100px" }}>
+    <div style={{ padding: "18px 18px 120px" }}>
       <Disp c={c} size={30} style={{ marginBottom: 18 }}>TRACK</Disp>
 
       <Card c={c} style={{ marginBottom: 14 }}>
@@ -2352,7 +2002,7 @@ function MealsScreen({ c, tier, onUpgrade, onLog }) {
   if (open) {
     const r = open;
     return (
-      <div style={{ padding: "0 0 100px" }}>
+      <div style={{ padding: "0 0 120px" }}>
         <div style={{ height: 190, position: "relative" }}>
           {FoodArt[r.art]}
           <button onClick={() => setOpen(null)} style={{
@@ -2400,7 +2050,7 @@ function MealsScreen({ c, tier, onUpgrade, onLog }) {
   }
 
   return (
-    <div style={{ padding: "18px 18px 100px" }}>
+    <div style={{ padding: "18px 18px 120px" }}>
       <Disp c={c} size={30} style={{ marginBottom: 4 }}>MEALS</Disp>
       <div style={{ fontFamily: "Inter", fontSize: 13, color: c.muted, marginBottom: 16 }}>Real food. Minimal effort. No sad chicken.</div>
 
@@ -2475,7 +2125,7 @@ function Checkout({ c, plan, email, onBack, onSuccess }) {
   };
 
   return (
-    <div style={{ padding: "18px 18px 100px" }}>
+    <div style={{ padding: "18px 18px 120px" }}>
       <button onClick={onBack} style={{ background: "none", border: "none", cursor: "pointer",
         color: c.muted, display: "flex", alignItems: "center", gap: 6, padding: 0, marginBottom: 16 }}>
         <ArrowLeft size={17} /><span style={{ fontFamily: "Inter", fontSize: 13, fontWeight: 600 }}>Back</span>
@@ -2539,7 +2189,7 @@ const REWARD_PRESETS = [
   { days: 14, treat: "New workout gear" },
 ];
 
-function RewardsScreen({ c, p, rewards, setRewards, onBack, onClaim, toast }) {
+function RewardsScreen({ c, p, rewards, setRewards, onClaim, toast }) {
   const streak = p.streak;
   const [days, setDays] = useState(3);
   const [treat, setTreat] = useState("");
@@ -2569,7 +2219,7 @@ function RewardsScreen({ c, p, rewards, setRewards, onBack, onClaim, toast }) {
   const totalEarned = rewards.list.reduce((s, r) => s + r.earned, 0);
 
   return (
-    <div style={{ padding: "18px 18px 100px" }}>
+    <div style={{ padding: "18px 18px 120px" }}>
       <Disp c={c} size={30} style={{ marginBottom: 4 }}>MY REWARDS</Disp>
       <div style={{ fontFamily: "Inter", fontSize: 13, color: c.muted, marginBottom: 18, lineHeight: 1.55 }}>
         Pick a treat, pick the streak that earns it. Totally optional — turn it on or off whenever you want.
@@ -2740,12 +2390,11 @@ function ProfileScreen({ c, p, setP, dark, setDark, onCheckout, onSignOut, onPro
 
   const PLANS = [
     { id: "free", name: "Free", price: "$0", f: ["Basic workouts", "Streaks & badges"] },
-    { id: "premium", name: "Premium", price: "$9.99/mo", priceId: "price_premium_monthly", f: ["Full adaptive programming", "Meal prep plans", "Streak freezes", "No ads"] },
-    { id: "elite", name: "Elite", price: "$19.99/mo", priceId: "price_elite_monthly", f: ["Everything in Premium", "Advanced analytics", "Priority program drops"] },
+    { id: "premium", name: "Premium", price: "$9.99/mo", priceId: "price_premium_monthly", f: ["Personalized guidance from Dr. Smith", "Priority DM access for form checks", "Full adaptive programming", "Weekly meal prep plans"] },
   ];
 
   return (
-    <div style={{ padding: "18px 18px 100px" }}>
+    <div style={{ padding: "18px 18px 120px" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
         <Disp c={c} size={30}>PROFILE</Disp>
         <button onClick={() => setEdit(true)} style={{
@@ -2828,7 +2477,7 @@ function ProfileScreen({ c, p, setP, dark, setDark, onCheckout, onSignOut, onPro
       <Card c={c} style={{ marginBottom: 14 }}>
         <Label c={c}>Your Numbers</Label>
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-          {[["Age", p.age], ["Height", `${p.heightFt}'${p.heightIn || 0}"`], ["Weight", `${p.weight} lbs`],
+          {[["Age", p.age || "—"], ["Height", p.heightFt ? `${p.heightFt}'${p.heightIn || 0}"` : "—"], ["Weight", p.weight ? `${p.weight} lbs` : "—"],
             ["Goal Weight", p.goalWeight ? `${p.goalWeight} lbs` : "—"], ["Phone", p.phone || "—"],
             ["Days / week", p.daysPerWeek]].map(([k, v]) => (
             <div key={k} style={{ display: "flex", justifyContent: "space-between" }}>
@@ -2861,7 +2510,7 @@ function ProfileScreen({ c, p, setP, dark, setDark, onCheckout, onSignOut, onPro
             <Card key={pl.id} c={c} style={{ padding: 15, border: `1.5px solid ${cur ? c.turq : c.border}` }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 7 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
-                  {pl.id === "elite" && <Crown size={14} color={c.gold} />}
+                  {pl.id === "premium" && <Crown size={14} color={c.gold} />}
                   <span style={{ fontFamily: "Inter", fontWeight: 800, fontSize: 15, color: c.text }}>{pl.name}</span>
                 </div>
                 <span style={{ fontFamily: "'JetBrains Mono'", fontSize: 13, color: c.red, fontWeight: 700 }}>{pl.price}</span>
@@ -2885,24 +2534,6 @@ function ProfileScreen({ c, p, setP, dark, setDark, onCheckout, onSignOut, onPro
             </Card>
           );
         })}
-      </div>
-
-      <Label c={c}>Program Packs</Label>
-      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-        {[{ name: "6-Week Marathon Prep", price: "$9.99", priceId: "price_marathon" },
-          { name: "High-Protein Recipe Pack", price: "$4.99", priceId: "price_recipes" },
-          { name: "Mobility & Joint Rescue", price: "$6.99", priceId: "price_mobility" }].map(pk => (
-          <Card key={pk.name} c={c} style={{ padding: 14, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <Gift size={16} color={c.turq} />
-              <span style={{ fontFamily: "Inter", fontSize: 13, fontWeight: 700, color: c.text }}>{pk.name}</span>
-            </div>
-            <button onClick={() => onCheckout({ ...pk, id: "pack" })} style={{
-              padding: "7px 13px", borderRadius: 9, border: `1px solid ${c.turq}`, background: "transparent",
-              color: c.turq, fontFamily: "Inter", fontWeight: 800, fontSize: 12, cursor: "pointer", flexShrink: 0,
-            }}>{pk.price}</button>
-          </Card>
-        ))}
       </div>
 
       <button onClick={onAdmin} style={{
@@ -2937,10 +2568,12 @@ function ProfileEditor({ c, p, onSave, onCancel }) {
     if (dg.length > 3) return `(${dg.slice(0, 3)}) ${dg.slice(3)}`;
     return dg;
   };
-  const ok = d.name.trim() && d.email.includes("@") && d.age && d.heightFt && d.weight && d.goalBodies.length > 0;
+  // Quick-start users skip the personal fields, so only goals are required here.
+  // Email is validated only when they actually typed one.
+  const ok = d.goalBodies.length > 0 && (!d.email || d.email.includes("@"));
 
   return (
-    <div style={{ padding: "18px 18px 100px" }}>
+    <div style={{ padding: "18px 18px 120px" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
         <Disp c={c} size={30}>EDIT PROFILE</Disp>
         <button onClick={onCancel} style={{
@@ -3115,7 +2748,7 @@ function AdminScreen({ c, p, water, cals, rewards, custom, onBack, toast }) {
   }, [ok]);
 
   if (!ok) return (
-    <div style={{ padding: "18px 18px 100px" }}>
+    <div style={{ padding: "18px 18px 120px" }}>
       <button onClick={onBack} style={{ background: "none", border: "none", cursor: "pointer",
         color: c.muted, display: "flex", alignItems: "center", gap: 6, padding: 0, marginBottom: 16 }}>
         <ArrowLeft size={17} /><span style={{ fontFamily: "Inter", fontSize: 13, fontWeight: 600 }}>Back</span>
@@ -3156,7 +2789,7 @@ function AdminScreen({ c, p, water, cals, rewards, custom, onBack, toast }) {
   };
 
   return (
-    <div style={{ padding: "18px 18px 100px" }}>
+    <div style={{ padding: "18px 18px 120px" }}>
       <button onClick={onBack} style={{ background: "none", border: "none", cursor: "pointer",
         color: c.muted, display: "flex", alignItems: "center", gap: 6, padding: 0, marginBottom: 16 }}>
         <ArrowLeft size={17} /><span style={{ fontFamily: "Inter", fontSize: 13, fontWeight: 600 }}>Back</span>
@@ -3256,7 +2889,7 @@ function Nav({ c, active, set }) {
       position: "absolute", bottom: 0, left: 0, right: 0, height: 74, background: c.bgEl,
       borderTop: `1px solid ${c.border}`, display: "flex", alignItems: "center",
       justifyContent: "space-around", paddingBottom: 8, zIndex: 50, paddingInline: 2,
-    }}>
+    }} className="aac-nav">
       {tabs.map(t => {
         const on = active === t.id, I = t.icon;
         return (
@@ -3416,14 +3049,18 @@ export default function App() {
     ];
   }, [p.lastDone, water, cals]);
 
-  const finishOnboard = (f) => { setP(prev => ({ ...prev, ...f })); setStage("confirm"); };
-  const emailConfirmed = () => { setStage("app"); celebrate(); toast(`Welcome, ${p.name}. Your plan is live 🔥`); };
+  const finishOnboard = (f) => {
+    setP(prev => ({ ...prev, ...f }));
+    setStage("app");
+    celebrate();
+    toast(f.name ? `Welcome, ${f.name}. Your plan is live 🔥` : "Plan locked in. Let's train 🔥");
+  };
 
   const goCheckout = (plan) => { setCheckoutPlan(plan); setTab("checkout"); };
   const paySuccess = (plan) => {
-    if (plan.id !== "pack") setP(x => ({ ...x, tier: plan.id, freezes: x.freezes + 3 }));
+    setP(x => ({ ...x, tier: plan.id, freezes: x.freezes + 3 }));
     setCheckoutPlan(null); setTab("profile"); celebrate();
-    toast(plan.id === "pack" ? `${plan.name} unlocked 🎁` : `${plan.name} active — trial started`);
+    toast(`${plan.name} active — trial started`);
   };
 
   const logMeal = (r) => {
@@ -3434,14 +3071,61 @@ export default function App() {
 
   return (
     <div style={{
-      width: "100%", maxWidth: 420, height: 800, margin: "0 auto", position: "relative",
-      background: c.bg, borderRadius: 34, overflow: "hidden", border: `1px solid ${c.border}`,
-      fontFamily: "Inter, sans-serif", boxShadow: "0 24px 70px rgba(0,0,0,.4)",
-    }}>
+      width: "100%", maxWidth: 420, margin: "0 auto", position: "relative",
+      height: "100dvh", background: c.bg, overflow: "hidden",
+      fontFamily: "Inter, sans-serif",
+    }} className="aac-frame">
       <style>{`
         ${FONTS}
         * { box-sizing: border-box; }
         ::-webkit-scrollbar { display: none; }
+        /* Lock the page so the app owns the whole screen, like a native app.
+           Overrides anything the host page sets on html/body/#root. */
+        html, body {
+          margin: 0 !important; padding: 0 !important;
+          height: 100% !important; width: 100% !important;
+          background: ${c.bg} !important;
+          overscroll-behavior: none; overflow: hidden !important;
+          display: block !important;
+        }
+        #root {
+          margin: 0 !important; padding: 0 !important;
+          height: 100% !important; width: 100% !important;
+          display: block !important; min-height: 0 !important;
+        }
+        /* Anchoring to all four edges avoids the 100%-vs-toolbar problem on iOS */
+        .aac-frame {
+          position: fixed !important;
+          top: 0 !important; right: 0 !important; bottom: 0 !important; left: 0 !important;
+          width: auto !important; height: auto !important; max-width: none !important;
+          margin: 0 !important; border-radius: 0 !important; border: none !important;
+          box-shadow: none !important;
+        }
+        .aac-scroll {
+          height: 100%; overflow-y: auto; -webkit-overflow-scrolling: touch;
+          padding-top: env(safe-area-inset-top, 0px);
+        }
+        .aac-nav {
+          height: auto !important;
+          padding-top: 9px !important;
+          padding-bottom: calc(9px + env(safe-area-inset-bottom, 0px)) !important;
+        }
+        .aac-toast { top: calc(14px + env(safe-area-inset-top, 0px)) !important; }
+        /* Desktop / tablet: show it as a phone-shaped frame again */
+        /* Desktop / tablet: restore the centred phone-shaped frame */
+        @media (min-width: 480px) and (min-height: 700px) {
+          html, body { overflow: auto !important; }
+          body { display: flex !important; justify-content: center; align-items: center; }
+          #root { display: flex !important; justify-content: center; height: auto !important; }
+          .aac-frame {
+            position: relative !important;
+            top: auto !important; right: auto !important; bottom: auto !important; left: auto !important;
+            width: 100% !important; max-width: 420px !important; margin: 0 auto !important;
+            height: min(860px, calc(100dvh - 24px)) !important;
+            border-radius: 34px !important; border: 1px solid ${c.border} !important;
+            box-shadow: 0 24px 70px rgba(0,0,0,.4) !important;
+          }
+        }
         @keyframes toastIn { from { opacity:0; transform: translate(-50%,-8px) } to { opacity:1; transform: translate(-50%,0) } }
         @keyframes fadeIn { from { opacity:0 } to { opacity:1 } }
         @keyframes popIn { from { opacity:0; transform: scale(.85) } to { opacity:1; transform: scale(1) } }
@@ -3460,7 +3144,7 @@ export default function App() {
       <Confetti c={c} fire={confetti} key={confetti} />
       <LevelUp c={c} data={modal} gender={p.gender} onClose={() => setModal(null)} />
 
-      <div style={{ height: "100%", overflowY: "auto" }}>
+      <div className="aac-scroll">
         {!loaded ? (
           <div style={{ height: "100%", display: "flex", flexDirection: "column",
             alignItems: "center", justifyContent: "center", gap: 16 }}>
@@ -3472,14 +3156,13 @@ export default function App() {
         ) : (
           <>
             {stage === "onboarding" && <Onboarding c={c} onDone={finishOnboard} />}
-        {stage === "confirm" && <ConfirmEmail c={c} profile={p} onConfirm={emailConfirmed} />}
         {stage === "app" && (
           <>
             {tab === "home" && <HomeScreen c={c} p={p} water={water} cals={cals} badges={badges}
               quests={quests} rewards={rewards} onTrain={() => setTab("train")}
               onSessions={() => setTab("sessions")} onRewards={() => setTab("rewards")} />}
             {tab === "rewards" && <RewardsScreen c={c} p={p} rewards={rewards} setRewards={setRewards}
-              onBack={() => setTab("home")} onClaim={onRewardClaim} toast={toast} />}
+              onClaim={onRewardClaim} toast={toast} />}
             {tab === "train" && <TrainScreen c={c} p={p} setP={setP} toast={toast} celebrate={celebrate}
               custom={custom} setCustom={setCustom} />}
             {tab === "sessions" && <SessionsScreen c={c} p={p} />}
