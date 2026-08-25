@@ -95,7 +95,7 @@
                radial-gradient(50% 50% at 82% 12%,rgba(46,217,195,.16),transparent 72%);
     pointer-events:none;
   }
-  .hero{position:relative;display:grid;grid-template-columns:1.15fr .85fr;gap:clamp(28px,5vw,64px);align-items:center;}
+  .hero{position:relative;display:block;max-width:760px;}
   @media(max-width:900px){.hero{grid-template-columns:1fr;}}
 
   h1{
@@ -107,26 +107,6 @@
   .hero p{max-width:44ch;margin:20px 0 30px;}
   .hero-cta{display:flex;flex-wrap:wrap;gap:12px;}
   .hero-note{margin-top:18px;font-size:12.5px;color:var(--muted);font-family:var(--mono);}
-
-  /* ── signature: the consistency grid ──── */
-  .grid-card{
-    background:var(--el);border:1px solid var(--line);border-radius:22px;
-    padding:22px;box-shadow:0 30px 70px rgba(0,0,0,.5);
-  }
-  .grid-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:16px;}
-  .grid-head .n{font-family:var(--display);font-size:38px;line-height:1;color:var(--red);}
-  .grid-head .n small{font-family:var(--body);font-size:11px;font-weight:800;letter-spacing:.18em;color:var(--muted);display:block;margin-top:4px;}
-  .grid-head .k{font-family:var(--mono);font-size:11px;color:var(--muted);text-align:right;line-height:1.7;}
-  .grid{display:grid;grid-template-columns:repeat(14,1fr);gap:6px;}
-  .cell{
-    aspect-ratio:1;border-radius:4px;background:var(--el2);
-    transition:background .45s ease,transform .45s ease,box-shadow .45s ease;
-  }
-  .cell.on{background:var(--red);box-shadow:0 0 12px rgba(240,32,47,.5);}
-  .cell.core{background:var(--turq);box-shadow:0 0 12px rgba(46,217,195,.45);}
-  .cell.miss{background:var(--el2);border:1px solid var(--line);}
-  .legend{display:flex;flex-wrap:wrap;gap:16px;margin-top:16px;font-size:11px;color:var(--muted);font-weight:600;}
-  .legend i{width:9px;height:9px;border-radius:3px;display:inline-block;margin-right:7px;vertical-align:middle;}
 
   /* ── sections ─────────────────────────── */
   section{padding:clamp(56px,8vw,104px) 0;border-top:1px solid var(--line);}
@@ -175,7 +155,7 @@
   .f p{margin:0;color:var(--muted);font-size:13.5px;line-height:1.62;}
 
   /* pricing */
-  .plans{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;align-items:start;}
+  .plans{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;align-items:start;max-width:720px;}
   @media(max-width:880px){.plans{grid-template-columns:1fr;}}
   .plan{background:var(--el);border:1px solid var(--line);border-radius:20px;padding:26px;display:flex;flex-direction:column;}
   .plan.feature{border-color:var(--red);box-shadow:0 16px 44px rgba(240,32,47,.16);position:relative;}
@@ -236,7 +216,7 @@
       <a href="#coach">Your trainer</a>
       <a href="#inside">The app</a>
       <a href="#pricing">Pricing</a>
-      <a class="btn btn-primary btn-sm" href="https://aacwithdrsmith-app.vercel.app/">Start free</a>
+      <a class="btn btn-primary btn-sm" href="https://aacwithdrsmith-app.vercel.app/">Start Free</a>
     </div>
   </div>
 </nav>
@@ -250,27 +230,12 @@
       hard workout — they need to keep showing up. Pick your level, get a plan that adapts to your
       gear and your bad knee, and finish every session with core.</p>
       <div class="hero-cta">
-        <a class="btn btn-primary" href="https://aacwithdrsmith-app.vercel.app/">Start training free</a>
+        <a class="btn btn-primary" href="https://aacwithdrsmith-app.vercel.app/">Start Your Free Training</a>
         <a class="btn btn-ghost" href="#coach">Meet your trainer</a>
       </div>
       <p class="hero-note">No card required · Works on any phone</p>
     </div>
 
-    <div class="grid-card" aria-hidden="true">
-      <div class="grid-head">
-        <div class="n">28<small>DAY STREAK</small></div>
-        <div class="k">
-          <span style="color:var(--red)">■</span> session logged<br>
-          <span style="color:var(--turq)">■</span> core finisher
-        </div>
-      </div>
-      <div class="grid" id="grid"></div>
-      <div class="legend">
-        <span><i style="background:var(--red)"></i>Showed up</span>
-        <span><i style="background:var(--turq)"></i>Core done</span>
-        <span><i style="background:var(--el2);border:1px solid var(--line)"></i>Rest day</span>
-      </div>
-    </div>
   </div>
 </header>
 
@@ -367,32 +332,22 @@
           <li>Streaks, XP, badges, and rewards</li>
           <li>Hydration and calorie tracking</li>
         </ul>
-        <a class="btn btn-ghost" href="https://aacwithdrsmith-app.vercel.app/">Start free</a>
+        <a class="btn btn-ghost" href="https://aacwithdrsmith-app.vercel.app/">Start Training</a>
       </div>
 
       <div class="plan feature">
         <h3>Premium</h3>
         <div class="price">$9.99<sub>/month</sub></div>
         <ul>
-          <li>Everything in Free</li>
+          <li>Personalized guidance from Dr. Smith</li>
+          <li>Priority DM access for form checks and questions</li>
           <li>Full adaptive programming</li>
           <li>Weekly meal prep plans</li>
-          <li>Extra streak freezes</li>
-          <li>No ads, ever</li>
+          <li>Everything in Free</li>
         </ul>
-        <a class="btn btn-primary" href="https://aacwithdrsmith-app.vercel.app/">Start free trial</a>
+        <a class="btn btn-primary" href="https://aacwithdrsmith-app.vercel.app/">Start Free, Upgrade Anytime</a>
       </div>
 
-      <div class="plan">
-        <h3>Elite</h3>
-        <div class="price">$19.99<sub>/month</sub></div>
-        <ul>
-          <li>Everything in Premium</li>
-          <li>Advanced progress analytics</li>
-          <li>Priority access to new programs</li>
-        </ul>
-        <a class="btn btn-ghost" href="https://aacwithdrsmith-app.vercel.app/">Go Elite</a>
-      </div>
     </div>
     <p style="margin-top:22px;font-size:12.5px;color:var(--muted)">
       In-person 1:1 sessions are booked and priced directly with Dr. Smith on Instagram.
@@ -434,39 +389,6 @@
 </footer>
 
 <script>
-  /* Signature element: a streak that fills in as you watch.
-     28 shown days — red = session logged, turquoise = core finisher, empty = rest. */
-  (function(){
-    var grid = document.getElementById('grid');
-    if(!grid) return;
-    var TOTAL = 42;                       // 3 rows of 14
-    var pattern = [];                     // build a believable 6-week streak
-    for(var i=0;i<TOTAL;i++){
-      var day = i % 7;
-      if(day === 6){ pattern.push('rest'); }        // one rest day a week
-      else if(i % 5 === 3){ pattern.push('core'); } // core-highlight days
-      else { pattern.push('on'); }
-    }
-    var cells = pattern.map(function(){
-      var d = document.createElement('div');
-      d.className = 'cell';
-      grid.appendChild(d);
-      return d;
-    });
-
-    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if(reduce){
-      cells.forEach(function(c,i){ if(pattern[i]!=='rest') c.classList.add(pattern[i]); });
-      return;
-    }
-    var i = 0;
-    var timer = setInterval(function(){
-      if(i >= cells.length){ clearInterval(timer); return; }
-      if(pattern[i] !== 'rest') cells[i].classList.add(pattern[i]);
-      i++;
-    }, 55);
-  })();
-
   /* Gentle scroll reveal */
   (function(){
     var els = document.querySelectorAll('.reveal');
