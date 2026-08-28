@@ -30,6 +30,8 @@ const FONTS = `@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&
 
 const IG_URL = "https://www.instagram.com/aac_allaboutconsistency?utm_source=qr";
 const IG_HANDLE = "@aac_allaboutconsistency";
+/* Live Stripe payment link for Premium. Replace here if the price ever changes. */
+const STRIPE_PREMIUM_LINK = "https://buy.stripe.com/bJe00ld7T3nS2cJgFA6Zy00";
 
 /* ═══════════════════════ AAC WORDMARK ═══════════════════════ */
 function Logo({ c, size = 62, radius = 18, fontSize }) {
@@ -47,27 +49,6 @@ function Logo({ c, size = 62, radius = 18, fontSize }) {
       }}>AAC</span>
     </div>
   );
-}
-
-/* ═══════════════════════ PAYMENT CONFIG ═══════════════════════ */
-const PAYMENT_CONFIG = {
-  stripePublishableKey: "pk_test_REPLACE_ME",
-  checkoutEndpoint: "/api/create-checkout-session",
-  liveMode: false,
-};
-
-async function processPayment({ plan, card }) {
-  if (PAYMENT_CONFIG.liveMode) {
-    const res = await fetch(PAYMENT_CONFIG.checkoutEndpoint, {
-      method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ priceId: plan.priceId, email: card.email }),
-    });
-    if (!res.ok) throw new Error("Payment failed. Check your card details and try again.");
-    return res.json();
-  }
-  await new Promise((r) => setTimeout(r, 1500));
-  if (card.number.replace(/\s/g, "").endsWith("0000")) throw new Error("Card declined. Try a different card.");
-  return { ok: true, demo: true, subscriptionId: "sub_demo_" + Date.now() };
 }
 
 /* ═══════════════════════ DATA ═══════════════════════ */
@@ -2105,83 +2086,6 @@ function MealsScreen({ c, tier, onUpgrade, onLog }) {
   );
 }
 
-/* ═══════════════════════ CHECKOUT ═══════════════════════ */
-function Checkout({ c, plan, email, onBack, onSuccess }) {
-  const [card, setCard] = useState({ email: email || "", number: "", exp: "", cvc: "", name: "", zip: "" });
-  const [busy, setBusy] = useState(false);
-  const [err, setErr] = useState("");
-  const up = (k, v) => setCard(p => ({ ...p, [k]: v }));
-  const fmtNum = v => v.replace(/\D/g, "").slice(0, 16).replace(/(.{4})/g, "$1 ").trim();
-  const fmtExp = v => { const d = v.replace(/\D/g, "").slice(0, 4); return d.length > 2 ? d.slice(0, 2) + "/" + d.slice(2) : d; };
-
-  const valid = card.email.includes("@") && card.number.replace(/\s/g, "").length === 16
-    && card.exp.length === 5 && card.cvc.length >= 3 && card.name.trim() && card.zip.length >= 5;
-
-  const pay = async () => {
-    setErr(""); setBusy(true);
-    try { await processPayment({ plan, card }); onSuccess(plan); }
-    catch (e) { setErr(e.message); }
-    finally { setBusy(false); }
-  };
-
-  return (
-    <div style={{ padding: "18px 18px 120px" }}>
-      <button onClick={onBack} style={{ background: "none", border: "none", cursor: "pointer",
-        color: c.muted, display: "flex", alignItems: "center", gap: 6, padding: 0, marginBottom: 16 }}>
-        <ArrowLeft size={17} /><span style={{ fontFamily: "Inter", fontSize: 13, fontWeight: 600 }}>Back</span>
-      </button>
-      <Disp c={c} size={30} style={{ marginBottom: 4 }}>CHECKOUT</Disp>
-      <div style={{ fontFamily: "Inter", fontSize: 13, color: c.muted, marginBottom: 18 }}>
-        {plan.name} — {plan.price}. Cancel anytime.
-      </div>
-
-      <Card c={c} style={{ marginBottom: 14, background: c.turqDim, border: `1px solid ${c.turq}` }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <div>
-            <div style={{ fontFamily: "Inter", fontSize: 14, fontWeight: 800, color: c.text }}>{plan.name}</div>
-            <div style={{ fontFamily: "Inter", fontSize: 11.5, color: c.muted, marginTop: 3 }}>7-day free trial, then billed monthly</div>
-          </div>
-          <Disp c={c} size={26} style={{ color: c.turq }}>{plan.price}</Disp>
-        </div>
-      </Card>
-
-      <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 16 }}>
-        <Field c={c} label="Email" value={card.email} placeholder="you@email.com" onChange={e => up("email", e.target.value)} />
-        <Field c={c} label="Card Number" value={card.number} placeholder="4242 4242 4242 4242" inputMode="numeric"
-          onChange={e => up("number", fmtNum(e.target.value))} />
-        <div style={{ display: "flex", gap: 10 }}>
-          <div style={{ flex: 1 }}>
-            <Field c={c} label="Expiry" value={card.exp} placeholder="MM/YY" inputMode="numeric" onChange={e => up("exp", fmtExp(e.target.value))} />
-          </div>
-          <div style={{ flex: 1 }}>
-            <Field c={c} label="CVC" value={card.cvc} placeholder="123" inputMode="numeric"
-              onChange={e => up("cvc", e.target.value.replace(/\D/g, "").slice(0, 4))} />
-          </div>
-        </div>
-        <Field c={c} label="Name on Card" value={card.name} placeholder="Jordan Reyes" onChange={e => up("name", e.target.value)} />
-        <Field c={c} label="ZIP" value={card.zip} placeholder="90210" inputMode="numeric"
-          onChange={e => up("zip", e.target.value.replace(/\D/g, "").slice(0, 5))} />
-      </div>
-
-      {err && (
-        <div style={{ background: c.redDim, border: `1px solid ${c.red}`, borderRadius: 12, padding: 12, marginBottom: 14,
-          fontFamily: "Inter", fontSize: 12.5, color: c.red, fontWeight: 600 }}>{err}</div>
-      )}
-
-      <button onClick={pay} disabled={!valid || busy} style={btn(c, !valid || busy)}>
-        {busy ? "Processing…" : <>Start Free Trial <Shield size={17} /></>}
-      </button>
-
-      <div style={{ display: "flex", alignItems: "center", gap: 7, marginTop: 14, justifyContent: "center" }}>
-        <Lock size={12} color={c.muted} />
-        <span style={{ fontFamily: "Inter", fontSize: 11, color: c.muted }}>
-          {PAYMENT_CONFIG.liveMode ? "Secured by Stripe" : "Demo mode — no card is charged"}
-        </span>
-      </div>
-    </div>
-  );
-}
-
 /* ═══════════════════════ REWARDS (optional, toggle anytime) ═══════════════════════ */
 const REWARD_PRESETS = [
   { days: 3, treat: "Sweet treat this weekend" },
@@ -2364,7 +2268,7 @@ function RewardsScreen({ c, p, rewards, setRewards, onClaim, toast }) {
 }
 
 /* ═══════════════════════ PROFILE ═══════════════════════ */
-function ProfileScreen({ c, p, setP, dark, setDark, onCheckout, onSignOut, onProgress, toast, onAdmin }) {
+function ProfileScreen({ c, p, setP, dark, setDark, onSignOut, onProgress, toast, onAdmin }) {
   const [edit, setEdit] = useState(false);
 
   const handleSave = (draft) => {
@@ -2503,6 +2407,14 @@ function ProfileScreen({ c, p, setP, dark, setDark, onCheckout, onSignOut, onPro
       </Card>
 
       <Label c={c}>Subscription</Label>
+      <div style={{ background: c.turqDim, border: `1px solid ${c.turq}`, borderRadius: 13,
+        padding: 13, marginBottom: 12, display: "flex", gap: 10, alignItems: "flex-start" }}>
+        <Mail size={15} color={c.turq} style={{ flexShrink: 0, marginTop: 2 }} />
+        <div style={{ fontFamily: "Inter", fontSize: 11.5, color: c.text, lineHeight: 1.55 }}>
+          After you subscribe, Dr. Smith will reach out on Instagram within 24 hours to
+          start your personalized guidance. Use the same email at checkout that you use here.
+        </div>
+      </div>
       <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 18 }}>
         {PLANS.map(pl => {
           const cur = p.tier === pl.id;
@@ -2526,10 +2438,11 @@ function ProfileScreen({ c, p, setP, dark, setDark, onCheckout, onSignOut, onPro
                   color: c.muted, fontFamily: "Inter", fontWeight: 700, fontSize: 12, cursor: "pointer",
                 }}>Downgrade</button>
               ) : (
-                <button onClick={() => onCheckout(pl)} style={{
+                <a href={STRIPE_PREMIUM_LINK} target="_blank" rel="noopener noreferrer" style={{
                   padding: "9px 15px", borderRadius: 10, border: "none", background: c.red, color: "#fff",
                   fontFamily: "Inter", fontWeight: 800, fontSize: 12, cursor: "pointer",
-                }}>Start 7-Day Free Trial</button>
+                  textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 6,
+                }}>Get Premium <ExternalLink size={13} /></a>
               )}
             </Card>
           );
@@ -2917,7 +2830,6 @@ export default function App() {
   const [toastMsg, setToastMsg] = useState(null);
   const [confetti, setConfetti] = useState(0);
   const [modal, setModal] = useState(null);
-  const [checkoutPlan, setCheckoutPlan] = useState(null);
   const [custom, setCustom] = useState({});
 
   const [p, setP] = useState({
@@ -3056,12 +2968,6 @@ export default function App() {
     toast(f.name ? `Welcome, ${f.name}. Your plan is live 🔥` : "Plan locked in. Let's train 🔥");
   };
 
-  const goCheckout = (plan) => { setCheckoutPlan(plan); setTab("checkout"); };
-  const paySuccess = (plan) => {
-    setP(x => ({ ...x, tier: plan.id, freezes: x.freezes + 3 }));
-    setCheckoutPlan(null); setTab("profile"); celebrate();
-    toast(`${plan.name} active — trial started`);
-  };
 
   const logMeal = (r) => {
     setCals(x => ({ ...x, entries: [...x.entries, { id: Date.now(), name: r.name, cal: r.cal }] }));
@@ -3169,20 +3075,17 @@ export default function App() {
             {tab === "track" && <TrackScreen c={c} water={water} setWater={setWater} cals={cals} setCals={setCals} toast={toast} />}
             {tab === "meals" && <MealsScreen c={c} tier={p.tier} onLog={logMeal} onUpgrade={() => setTab("profile")} />}
             {tab === "profile" && <ProfileScreen c={c} p={p} setP={setP} dark={dark} setDark={setDark}
-              onCheckout={goCheckout} onSignOut={signOut} onProgress={onProgress} toast={toast}
+              onSignOut={signOut} onProgress={onProgress} toast={toast}
               onRewards={() => setTab("rewards")} rewards={rewards} onAdmin={() => setTab("admin")} />}
             {tab === "admin" && <AdminScreen c={c} p={p} water={water} cals={cals} rewards={rewards}
               custom={custom} onBack={() => setTab("profile")} toast={toast} />}
-            {tab === "checkout" && checkoutPlan && (
-              <Checkout c={c} plan={checkoutPlan} email={p.email} onBack={() => setTab("profile")} onSuccess={paySuccess} />
-            )}
           </>
         )}
           </>
         )}
       </div>
 
-      {stage === "app" && tab !== "checkout" && tab !== "admin" && <Nav c={c} active={tab} set={setTab} />}
+      {stage === "app" && tab !== "admin" && <Nav c={c} active={tab} set={setTab} />}
     </div>
   );
 }
